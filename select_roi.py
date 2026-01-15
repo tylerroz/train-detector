@@ -2,8 +2,7 @@ import cv2
 import json
 import os
 
-RTSP_URL = "rtsp://traincam:unionpacific111@192.168.1.233:554/stream1"
-ROI_FILE = "roi.json"
+CONFIG_FILE = "cam_config.json"
 
 drawing = False
 ix, iy = -1, -1
@@ -29,7 +28,12 @@ def mouse_callback(event, x, y, flags, param):
 def main():
     global roi
 
-    cap = cv2.VideoCapture(RTSP_URL, cv2.CAP_FFMPEG)
+    # Load config
+    with open(CONFIG_FILE, "r") as f:
+        config = json.load(f)
+    
+    rtsp_url = config["rtsp_url"]
+    cap = cv2.VideoCapture(rtsp_url, cv2.CAP_FFMPEG)
     if not cap.isOpened():
         raise RuntimeError("Failed to open camera stream")
 
@@ -67,10 +71,19 @@ def main():
                 "y2": y2
             }
 
-            with open(ROI_FILE, "w") as f:
-                json.dump(roi_data, f, indent=2)
+            # Update config with new ROI
+            try:
+                with open(CONFIG_FILE, "r") as f:
+                    config = json.load(f)
+                
+                config["roi"] = roi_data
+                
+                with open(CONFIG_FILE, "w") as f:
+                    json.dump(config, f, indent=2)
 
-            print(f"✅ ROI saved to {ROI_FILE}: {roi_data}")
+                print(f"✅ ROI saved to {CONFIG_FILE}: {roi_data}")
+            except (IOError, json.JSONDecodeError) as e:
+                print(f"❌ Error saving ROI: {e}")
 
         elif key == ord("q"):
             break

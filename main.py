@@ -1,11 +1,14 @@
 import cv2
 import time
+import json
 
-# this is okay, only exposed locally
-RTSP_URL = "rtsp://traincam:unionpacific111@192.168.1.233:554/stream1"
+# Load config
+with open("cam_config.json", "r") as f:
+    config = json.load(f)
 
-# coordinates of the ROI rectangle
-ROI = (1000, 900, 1700, 1000)  # x1, y1, x2, y2
+RTSP_URL = config["rtsp_url"]
+roi_config = config["roi"]
+ROI = (roi_config["x1"], roi_config["y1"], roi_config["x2"], roi_config["y2"])
 MOTION_AREA_THRESHOLD = 50
 START_FRAMES = 5
 STOP_FRAMES = 10
