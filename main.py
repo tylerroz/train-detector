@@ -27,7 +27,7 @@ def main():
     bg = cv2.createBackgroundSubtractorMOG2(
         history=500,
         varThreshold=16,
-        detectShadows=True
+        detectShadows=False
     )
 
     motion_frames = 0
@@ -59,9 +59,12 @@ def main():
         # -------------------------
         # MOTION DETECTION
         # -------------------------
-        mask = bg.apply(roi)
+        mask = bg.apply(roi, learningRate=0.001)
+
         _, mask = cv2.threshold(mask, 200, 255, cv2.THRESH_BINARY)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=3)
+
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel, iterations=1)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
 
         motion_area = cv2.countNonZero(mask)
 
