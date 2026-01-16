@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 
 class TrainGate:
+    START_RATIO = 0.35
+    STOP_RATIO  = 0.25   # lower threshold to keep train present
+    
     def __init__(self, persistence_frames=20):
         self.persistence_frames = persistence_frames
         self.state = {'persistence': 0}
@@ -25,9 +28,9 @@ class TrainGate:
             width_ratio = 0
 
         # Update persistence counter
-        if motion_ratio > 0.35 and width_ratio > 0.6:
+        if motion_ratio > self.START_RATIO and width_ratio > 0.6:
             self.state['persistence'] += 1
-        else:
+        elif motion_ratio < self.STOP_RATIO:
             self.state['persistence'] = 0
 
         return self.state['persistence'] >= self.persistence_frames
