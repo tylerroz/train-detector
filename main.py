@@ -86,6 +86,7 @@ def main():
     motion_frames = 0
     still_frames = 0
     motion_active = False
+    train_present = False
 
     while True:
         result = camera_read(cap, ROI)
@@ -108,19 +109,22 @@ def main():
             motion_active = True
             print("Motion START detected")
 
-        if motion_active and still_frames >= STOP_FRAMES:
-            motion_active = False
-            print("Motion END detected")
-
-        # if there was motion, check for train presence
-        if (motion_active):
+        # if there was motion, check for train presence first
+        if motion_active:
             train_present, state = train_presence_gate(mask, state)
             if train_present:
-                print("Train start detected!")
+                print("Train is present!")
 
-        # -------------------------
-        # DEBUG VISUALIZATION
-        # -------------------------
+        # then handle motion end
+        if motion_active and still_frames >= STOP_FRAMES:
+            motion_active = False
+            if train_present:
+                train_present = False
+                state['persistence'] = 0
+                print("Train is gone.")
+            print("Motion END detected")
+
+        # show camera with ROI rectangle and motion mask
         x1, y1, x2, y2 = ROI
         cv2.rectangle(full_frame, (x1, y1), (x2, y2), (0,255,0), 2)
         cv2.imshow("Full Frame", full_frame)
