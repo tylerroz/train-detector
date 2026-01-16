@@ -4,6 +4,7 @@ import json
 import sys
 
 from camera import open_camera, read_frame
+from helper import log
 from motion import MotionDetector
 from notifications import notify_train_arrived, notify_train_gone
 from train_gate import TrainGate
@@ -43,6 +44,7 @@ def main():
     motion_frames = 0
     still_frames = 0
     motion_active = False
+    train_timer = None
 
     while True:
         result = read_frame(cap, ROI)
@@ -74,10 +76,14 @@ def main():
         # Train gate update & edge detection
         prev_train, curr_train = train_gate.update(mask)
         if not prev_train and curr_train:
-            print("Train START detected!")
+            log("Train START detected!")
+            train_timer = time.time()
             if should_notify: notify_train_arrived()
         elif prev_train and not curr_train:
-            print("Train is GONE!")
+            log("Train is GONE!")
+            train_duration = time.time() - train_timer if train_timer else 0
+            log(f"Train duration: {train_duration:.1f} seconds")
+            train_timer = None
             if should_notify: notify_train_gone()
 
         # Visualization
