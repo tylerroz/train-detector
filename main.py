@@ -33,8 +33,11 @@ def camera_read(cap, roi):
     return frame[y1:y2, x1:x2], frame
 
 # used to detect motion in ROI
-def motion_detection(roi_frame, bg_subtractor, kernel, avg_history):
-    mask = bg_subtractor.apply(roi_frame, learningRate=0.001)
+def motion_detection(roi_frame, bg_subtractor, kernel, avg_history, train_present):
+    # this freezes learning rate if train is present, as to not begin ignoring the train
+    lr = 0 if train_present else 0.001
+    mask = bg_subtractor.apply(roi_frame, learningRate=lr)
+
     _, mask = cv2.threshold(mask, 200, 255, cv2.THRESH_BINARY)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
@@ -72,7 +75,6 @@ def train_presence_gate(mask, state):
     return train_present, state
 
 def main():
-    
     # setup capture from the network camera
     cap = cv2.VideoCapture(RTSP_URL, cv2.CAP_FFMPEG)
     if not cap.isOpened():
@@ -95,9 +97,10 @@ def main():
             continue
         roi_frame, full_frame = result
 
-        # continually detect motion
-        mask, avg_area = motion_detection(roi_frame, bg, kernel, avg_history)
+        # smooth motion detection with frozen learning rate if train present
+        mask, avg_area = motion_detection(roi_frame, bg, kernel, avg_history, train_present)
 
+        # motion detection
         if avg_area > MOTION_AREA_THRESHOLD:
             motion_frames += 1
             still_frames = 0
@@ -105,24 +108,22 @@ def main():
             still_frames += 1
             motion_frames = 0
 
+        # start / stop motion
         if not motion_active and motion_frames >= START_FRAMES:
             motion_active = True
             print("Motion START detected")
-
-        # if there was motion, check for train presence first
-        if motion_active:
-            train_present, state = train_presence_gate(mask, state)
-            if train_present:
-                print("Train is present!")
-
-        # then handle motion end
-        if motion_active and still_frames >= STOP_FRAMES:
+        elif motion_active and still_frames >= STOP_FRAMES:
             motion_active = False
-            if train_present:
-                train_present = False
-                state['persistence'] = 0
-                print("Train is gone.")
             print("Motion END detected")
+            
+        # now handle train presence
+        prev_train_present = train_present
+        train_present, state = train_presence_gate(mask, state)
+
+        if not prev_train_present and train_present:
+            print("Train START detected!")
+        elif prev_train_present and not train_present:
+            print("Train is GONE.")
 
         # show camera with ROI rectangle and motion mask
         x1, y1, x2, y2 = ROI
