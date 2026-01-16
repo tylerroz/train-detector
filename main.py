@@ -1,11 +1,16 @@
 import time
 import cv2
 import json
+import sys
 
 from camera import open_camera, read_frame
 from motion import MotionDetector
 from notifications import notify_train_arrived, notify_train_gone
 from train_gate import TrainGate
+
+# Program config
+debug = 'debug' in sys.argv
+should_notify = 'notify' in sys.argv
 
 # Load config
 with open("cam_config.json", "r") as f:
@@ -21,9 +26,19 @@ STOP_FRAMES = 20
 MOTION_AREA_THRESHOLD = 200
 
 def main():
+    print("Starting train detection...")
+    print("Arguments:")
+    print("  debug (enables verbose output and visualization):", debug)
+    print("  notify (enables push notifications):", should_notify)
+
     cap = open_camera(RTSP_URL)
+    print("Camera stream initialized.")
     motion_detector = MotionDetector(motion_threshold=MOTION_AREA_THRESHOLD)
+    print("Motion detector initialized.")
     train_gate = TrainGate()
+    print("Train gate initialized.")
+    
+    print("Ready and looking for trains...")
 
     motion_frames = 0
     still_frames = 0
@@ -51,26 +66,29 @@ def main():
         # Motion start / stop
         if not motion_active and motion_frames >= START_FRAMES:
             motion_active = True
-            print("Motion START detected")
+            if debug: print("Motion START detected")
         elif motion_active and still_frames >= STOP_FRAMES:
             motion_active = False
-            print("Motion END detected")
+            if debug: print("Motion END detected")
 
         # Train gate update & edge detection
         prev_train, curr_train = train_gate.update(mask)
         if not prev_train and curr_train:
             print("Train START detected!")
-            notify_train_arrived()
+            if should_notify: notify_train_arrived()
         elif prev_train and not curr_train:
-            notify_train_gone()
+            print("Train is GONE!")
+            if should_notify: notify_train_gone()
 
         # Visualization
-        x1, y1, x2, y2 = ROI
-        cv2.rectangle(full_frame, (x1,y1), (x2,y2), (0,255,0), 2)
-        cv2.imshow("Full Frame", full_frame)
-        cv2.imshow("Motion Mask", mask)
+        if debug:
+            x1, y1, x2, y2 = ROI
+            cv2.rectangle(full_frame, (x1,y1), (x2,y2), (0,255,0), 2)
+            cv2.imshow("Full Frame", full_frame)
+            cv2.imshow("Motion Mask", mask)
 
-        if cv2.waitKey(1) == 27:  # ESC
+        # Exit on ESC
+        if cv2.waitKey(1) == 27:
             break
 
     cap.release()
