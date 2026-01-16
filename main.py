@@ -3,6 +3,7 @@ import numpy as np
 import time
 import json
 from collections import deque
+from pushover import Client as PushoverClient
 
 # load config
 with open("cam_config.json", "r") as f:
@@ -74,6 +75,14 @@ def train_presence_gate(mask, state):
     train_present = state['persistence'] >= TRAIN_PERSISTENCE_FRAMES
     return train_present, state
 
+def train_arrived():
+    print("Train START detected!")
+    PushoverClient().send_message("A wild train has appeared.", title="Train has arrived!")
+    
+def train_gone():
+    print("Train is GONE.")
+    PushoverClient().send_message("Train has left the station.", title="Train is gone!")
+
 def main():
     # setup capture from the network camera
     cap = cv2.VideoCapture(RTSP_URL, cv2.CAP_FFMPEG)
@@ -121,9 +130,9 @@ def main():
         train_present, state = train_presence_gate(mask, state)
 
         if not prev_train_present and train_present:
-            print("Train START detected!")
+            train_arrived()
         elif prev_train_present and not train_present:
-            print("Train is GONE.")
+            train_gone()
 
         # show camera with ROI rectangle and motion mask
         x1, y1, x2, y2 = ROI
