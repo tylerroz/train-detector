@@ -36,15 +36,16 @@ def main():
     print("Camera stream initialized.")
     motion_detector = MotionDetector(motion_threshold=MOTION_AREA_THRESHOLD)
     print("Motion detector initialized.")
-    train_gate = TrainGate()
+    train_gate = TrainGate(
+        persistence_frames = 35,
+        grace_frames = 40,
+    )
     print("Train gate initialized.")
     
     print("Ready and looking for trains...")
 
-    motion_frames = 0
-    still_frames = 0
-    motion_active = False
     train_timer = None
+    prev_train_present = False
 
     while True:
         result = read_frame(cap, ROI)
@@ -55,36 +56,23 @@ def main():
 
         # Freeze learning if train is present
         freeze_bg = train_gate.train_present
-        mask, avg_area = motion_detector.detect(roi_frame, freeze_bg=freeze_bg)
-
-        # Motion logic
-        if avg_area > MOTION_AREA_THRESHOLD:
-            motion_frames += 1
-            still_frames = 0
-        else:
-            still_frames += 1
-            motion_frames = 0
-
-        # Motion start / stop
-        if not motion_active and motion_frames >= START_FRAMES:
-            motion_active = True
-            if debug: print("Motion START detected")
-        elif motion_active and still_frames >= STOP_FRAMES:
-            motion_active = False
-            if debug: print("Motion END detected")
-
-        # Train gate update & edge detection
-        prev_train, curr_train = train_gate.update(mask)
-        if not prev_train and curr_train:
+        mask, avg_area = motion_detector.detect(roi_frame, freeze_bg=freeze_bg)   
+                
+        train_present, state = train_gate.update(mask)
+        
+        if not prev_train_present and train_present:
             log("Train START detected!")
             train_timer = time.time()
             if should_notify: notify_train_arrived()
-        elif prev_train and not curr_train:
+
+        elif prev_train_present and not train_present:
             log("Train is GONE!")
             train_duration = time.time() - train_timer if train_timer else 0
             log(f"Train duration: {train_duration:.1f} seconds")
             train_timer = None
             if should_notify: notify_train_gone()
+
+        prev_train_present = train_present
 
         # Visualization
         if debug:
