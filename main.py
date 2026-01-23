@@ -1,5 +1,6 @@
 import time
 import cv2
+import database
 import json
 import sys
 
@@ -42,6 +43,15 @@ def main():
     )
     print("Train gate initialized.")
     
+    try:
+        database.get_conn()
+    except Exception as e:
+        print("ERROR: Could not connect to database:", e)
+        return
+    
+    database.recover_open_events()
+    print("Database connection verified.")
+        
     print("Ready and looking for trains...")
 
     train_timer = None
@@ -64,6 +74,7 @@ def main():
             log("Train START detected!")
             train_timer = time.time()
             if should_notify: notify_train_arrived()
+            database.start_train_event()
 
         elif prev_train_present and not train_present:
             log("Train is GONE!")
@@ -71,6 +82,7 @@ def main():
             log(f"Train duration: {train_duration:.1f} seconds")
             train_timer = None
             if should_notify: notify_train_gone()
+            database.end_train_event()
 
         prev_train_present = train_present
 
