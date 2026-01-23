@@ -55,7 +55,8 @@ def end_train_event():
         return
 
     end = now_utc()
-    duration = int((end - row["start_time"]).total_seconds())
+    start = row["start_time"].replace(tzinfo=timezone.utc)
+    duration = int((end - start).total_seconds())
 
     cur.execute("""
         UPDATE train_events
@@ -80,7 +81,7 @@ def recover_open_events():
     rows = cur.fetchall()
 
     for row in rows:
-        start = row["start_time"]
+        start = row["start_time"].replace(tzinfo=timezone.utc)
         end = now_utc()
         duration = int((end - start).total_seconds())
 
