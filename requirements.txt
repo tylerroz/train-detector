@@ -1,4 +1,4 @@
 opencv-python
 numpy
 python-pushover
-mariadb
+mysql-connector-python
