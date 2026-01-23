@@ -1,0 +1,17 @@
+body {
+  font-family: sans-serif;
+  padding: 20px;
+}
+
+.status {
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.status.active {
+  color: red;
+}
+
+.status.clear {
+  color: green;
+}
