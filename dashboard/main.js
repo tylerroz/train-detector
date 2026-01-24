@@ -133,7 +133,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 },
                 options: {
                     responsive: true,
-                    scales: { y: { beginAtZero: true } }
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            scaleSteps: 1
+                        }
+                    }
                 }
             });
         }
