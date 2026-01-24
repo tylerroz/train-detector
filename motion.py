@@ -6,7 +6,7 @@ class MotionDetector:
         self.motion_threshold = motion_threshold
         self.avg_history = deque(maxlen=moving_avg_frames)
         self.bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-            history=500, varThreshold=16, detectShadows=False
+            history=500, varThreshold=23, detectShadows=False
         )
         self.kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
 
