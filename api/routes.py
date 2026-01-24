@@ -24,7 +24,7 @@ def recent_trains():
         SELECT id, start_time, end_time, duration_seconds, status
         FROM train_events
         ORDER BY start_time DESC
-        LIMIT 5
+        LIMIT 10
     """)
     rows = cur.fetchall()
     conn.close()
