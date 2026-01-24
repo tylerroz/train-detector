@@ -1,5 +1,34 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    function formatLocalTime(timestamp) {
+        if (!timestamp) return "-"; // handle null/undefined
+        
+        // Replace space with "T" and append "Z" to treat as UTC
+        // "2026-01-24 00:45:47" → "2026-01-24T00:45:47Z"
+        const isoString = timestamp.replace(' ', 'T') + 'Z';
+        const date = new Date(isoString);
+        
+        // Options for formatting
+        const options = {
+            month: 'short',   // Jan, Feb, etc.
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true      // AM/PM format
+        };
+        
+        // undefined → uses the user's local timezone
+        return date.toLocaleString(undefined, options); 
+    }
+
+    function formatDuration(seconds) {
+        if (seconds == null || isNaN(seconds)) return "Active!";
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}m ${secs}s`;
+    }
+
     // --- Fetch Train Status ---
     async function fetchActive() {
         try {
@@ -17,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 body.classList.add("train-present");
                 statusCard.classList.add("train-present");
             } else {
-                statusDiv.textContent = "✅ No current train detected...";
+                statusDiv.textContent = "☹️ No current train detected...";
                 statusDiv.className = "status clear";
                 body.classList.remove("train-present");
                 statusCard.classList.remove("train-present");
@@ -42,9 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (row.status === "active" || row.active) tr.classList.add("active");
                 tr.innerHTML = `
                     <td>${row.status || "-"}</td>
-                    <td>${row.start_time}</td>
-                    <td>${row.end_time || "-"}</td>
-                    <td>${row.duration_seconds || "-"}</td>
+                    <td>${formatLocalTime(row.start_time)}</td>
+                    <td>${formatLocalTime(row.end_time)}</td>
+                    <td>${formatDuration(row.duration_seconds)}</td>
                 `;
                 tbody.appendChild(tr);
             });
