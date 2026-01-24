@@ -1,0 +1,111 @@
+/* --- Base page --- */
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #111827;
+  color: #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  transition: background 0.5s;
+}
+
+/* --- Glow effect --- */
+body.train-present {
+  box-shadow: 0 0 100px 40px rgba(255,107,107,0.4) inset;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 60px 20px rgba(255,107,107,0.3) inset; }
+  50% { box-shadow: 0 0 120px 50px rgba(255,107,107,0.5) inset; }
+}
+
+/* --- Status Card --- */
+.status-card {
+  background-color: #1f2937;
+  padding: 20px 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 5px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  transition: box-shadow 0.5s;
+  width: 90%;
+  max-width: 400px;
+}
+
+.status-card.train-present {
+  box-shadow: 0 0 30px 10px #ff6b6b;
+}
+
+.status-text {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* --- Cards (Tables & Charts) --- */
+.card {
+  background-color: #1f2937;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  width: 90%;
+  max-width: 800px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+}
+
+/* --- Recent Trains Table --- */
+.recent-trains-card h2,
+.chart-card h2 {
+  margin: 0 0 6px 0; /* top 0, bottom 6px */
+  padding: 0;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.recent-trains-card h2 {
+  color: #facc15;
+}
+
+#recentTrains {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#recentTrains thead {
+  background: linear-gradient(90deg, #1e293b, #111827);
+}
+
+#recentTrains th {
+  padding: 8px;
+  color: #f1f5f9;
+  font-weight: bold;
+  text-align: left;
+}
+
+#recentTrains td {
+  padding: 8px;
+  border-top: 1px solid #111827;
+  color: #e5e7eb;
+}
+
+#recentTrains tbody tr:nth-child(even) {
+  background-color: #161b22;
+}
+
+#recentTrains tbody tr:hover {
+  background-color: #222933;
+  box-shadow: inset 0 0 10px rgba(255,107,107,0.3);
+  transition: all 0.3s ease;
+}
+
+#recentTrains tbody tr.active {
+  border-left: 4px solid #ff6b6b;
+}
+
+/* --- Chart Card --- */
+.chart-card h2 {
+  color: #34d399;
+}

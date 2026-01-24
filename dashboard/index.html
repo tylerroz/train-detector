@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Train Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Status Card + Glow -->
+  <div id="statusCard" class="status-card">
+    <div id="train-status" class="status clear">✅ No current train detected...</div>
+  </div>
+
+  <!-- Recent Trains Table -->
+  <div class="card recent-trains-card">
+    <h2>Recent Trains</h2>
+    <table id="recentTrains">
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Start Time</th>
+          <th>End Time</th>
+          <th>Duration (s)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Chart Placeholder (optional) -->
+  <div class="card chart-card">
+    <h2>Trains per Day</h2>
+    <canvas id="dowChart"></canvas>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
