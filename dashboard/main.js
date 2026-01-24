@@ -3,10 +3,10 @@ async function fetchActive() {
     const data = await res.json();
     const statusDiv = document.getElementById("train-status");
     if(data.active) {
-        statusDiv.textContent = "🚨 Train Present";
+        statusDiv.textContent = "🚂 Train Present!";
         statusDiv.className = "status active";
     } else {
-        statusDiv.textContent = "✅ Clear";
+        statusDiv.textContent = "✅ All Clear";
         statusDiv.className = "status clear";
     }
 }
