@@ -59,9 +59,9 @@ class TrainGate:
         # TRAIN START LOGIC
         # ----------------------------
         if strong_motion:
-            self.state["persistence"] += 1
+            self.state["persistence"] += 2
         elif weak_motion:
-            self.state["persistence"] = max(0, self.state["persistence"] - 1)
+            self.state["persistence"] = max(0, self.state["persistence"] - 3)
 
         if (
             not self.state["train_present"]
