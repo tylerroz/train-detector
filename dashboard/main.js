@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
             hour: 'numeric',
             minute: '2-digit',
             second: '2-digit',
-            hour12: true      // AM/PM format
+            hour12: true,      // AM/PM format
+            timeZone: 'America/Chicago'
         };
         
         // undefined → uses the user's local timezone
@@ -83,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Fetch Trains Per Day Chart ---
+    // https://mariadb.com/docs/server/reference/sql-functions/date-time-functions/dayofweek
     async function fetchDowData() {
         try {
             const res = await fetch("/api/trains_per_dow");
@@ -103,27 +105,39 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    let dowChartInstance = null;
+
     async function renderDowChart() {
         const ctx = document.getElementById("dowChart").getContext("2d");
         const dowData = await fetchDowData();
+        const labels = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]; // matches 0=Sunday
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
-                datasets: [{
-                    label: "Trains per Day",
-                    data: dowData,
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
+        console.log("Chart labels:", labels);
+        console.log("Chart data:", dowData);
+
+        if (dowChartInstance) {
+            // update existing chart
+            dowChartInstance.data.datasets[0].data = dowData;
+            dowChartInstance.update();
+        } else {
+            // first time, create the chart
+            dowChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Trains per Day",
+                        data: dowData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
                 }
-            }
-        });
+            });
+        }
+        return dowChartInstance;
     }
 
     fetchActive();
@@ -133,4 +147,5 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(fetchRecentTrains, 10000);
 
     renderDowChart();
+    setInterval(renderDowChart, 10000);
 });
