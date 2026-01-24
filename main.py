@@ -38,8 +38,8 @@ def main():
     motion_detector = MotionDetector(motion_threshold=MOTION_AREA_THRESHOLD)
     print("Motion detector initialized.")
     train_gate = TrainGate(
-        persistence_frames = 35,
-        grace_frames = 40,
+        persistence_frames = 45,
+        grace_frames = 400, # camera is at 20fps
     )
     print("Train gate initialized.")
     

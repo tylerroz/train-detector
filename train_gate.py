@@ -47,8 +47,13 @@ class TrainGate:
             motion_ratio >= self.start_motion_ratio
             and width_ratio >= self.min_width_ratio
         )
+        
+        if self.state["train_present"]:
+            stop_ratio = self.stop_motion_ratio * 0.7
+        else:
+            stop_ratio = self.stop_motion_ratio
 
-        weak_motion = motion_ratio < self.stop_motion_ratio
+        weak_motion = motion_ratio < stop_ratio
 
         # ----------------------------
         # TRAIN START LOGIC
@@ -72,7 +77,8 @@ class TrainGate:
             if weak_motion:
                 self.state["grace"] += 1
             else:
-                self.state["grace"] = 0
+                # this adds grace 'decay', so that flatbeds don't cause train end
+                self.state["grace"] = max(0, self.state["grace"] - 3)
 
             if self.state["grace"] >= self.grace_frames:
                 self.state["train_present"] = False
