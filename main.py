@@ -102,7 +102,7 @@ def main():
         cv2.rectangle(full_frame, (x1,y1), (x2,y2), (0,255,0), 2)
         
         # this helps reduce CPU load by limiting live stream frame updates
-        if time.time() - last_stream_update_ts > 1:  # ~20fps
+        if time.time() - last_stream_update_ts > 5:
             update_frame(full_frame)
             last_stream_update_ts = time.time()
             
