@@ -43,12 +43,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (data.active) {
                 statusDiv.textContent = "🚂 Train Present!";
-                statusDiv.className = "status active";
                 body.classList.add("train-present");
                 statusCard.classList.add("train-present");
             } else {
                 statusDiv.textContent = "☹️ No current train detected...";
-                statusDiv.className = "status clear";
                 body.classList.remove("train-present");
                 statusCard.classList.remove("train-present");
             }
