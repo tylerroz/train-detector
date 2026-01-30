@@ -9,6 +9,9 @@ from helper import log
 from motion import MotionDetector
 from notifications import notify_train_arrived, notify_train_gone
 from train_gate import TrainGate
+from threading import Thread
+from video_server import start_video_server, update_frame
+
 
 # Program config
 debug = 'debug' in sys.argv
@@ -51,6 +54,14 @@ def main():
     
     database.recover_open_events()
     print("Database connection verified.")
+    
+    video_thread = Thread(
+        target=start_video_server,
+        daemon=True
+    )
+    video_thread.start()
+    last_stream_update_ts = 0
+    print("Video stream available on http://<host>:8080/video")
         
     print("Ready and looking for trains...")
 
@@ -87,9 +98,15 @@ def main():
         prev_train_present = train_present
 
         # Visualization
+        x1, y1, x2, y2 = ROI
+        cv2.rectangle(full_frame, (x1,y1), (x2,y2), (0,255,0), 2)
+        
+        # this helps reduce CPU load by limiting live stream frame updates
+        if time.time() - last_stream_update_ts > 1:  # ~20fps
+            update_frame(full_frame)
+            last_stream_update_ts = time.time()
+            
         if debug:
-            x1, y1, x2, y2 = ROI
-            cv2.rectangle(full_frame, (x1,y1), (x2,y2), (0,255,0), 2)
             cv2.imshow("Full Frame", full_frame)
             cv2.imshow("Motion Mask", mask)
 
