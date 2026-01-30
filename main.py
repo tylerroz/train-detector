@@ -9,6 +9,8 @@ from helper import log
 from motion import MotionDetector
 from notifications import notify_train_arrived, notify_train_gone
 from train_gate import TrainGate
+from threading import Thread
+from api.app import start_api
 
 # Program config
 debug = 'debug' in sys.argv
@@ -51,6 +53,10 @@ def main():
     
     database.recover_open_events()
     print("Database connection verified.")
+    
+    api_thread = Thread(target=start_api, daemon=True)
+    api_thread.start()
+    print("API started on :5000.")
         
     print("Ready and looking for trains...")
 
