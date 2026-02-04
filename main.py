@@ -67,6 +67,7 @@ def main():
 
     train_timer = None
     prev_train_present = False
+    current_train_direction = None
 
     while True:
         result = read_frame(cap, ROI)
@@ -128,8 +129,10 @@ def main():
         )
             
         if debug:
+            cv2.namedWindow("Full Frame", cv2.WINDOW_NORMAL)
             cv2.imshow("Full Frame", full_frame)
-            cv2.imshow("Motion Mask", mask)
+            cv2.namedWindow("ROI Motion Mask", cv2.WINDOW_NORMAL)
+            cv2.imshow("ROI Motion Mask", mask)
             # cv2.imshow("Overlayed Frame", overlayed_frame)
         
         # if current_train_direction:

@@ -37,7 +37,7 @@ def main():
     if not cap.isOpened():
         raise RuntimeError("Failed to open camera stream")
 
-    cv2.namedWindow("Select ROI")
+    cv2.namedWindow("Select ROI", cv2.WINDOW_NORMAL)
     cv2.setMouseCallback("Select ROI", mouse_callback)
 
     print("🖱 Click and drag to draw ROI")
