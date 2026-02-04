@@ -132,15 +132,10 @@ def main():
             cv2.namedWindow("Full Frame", cv2.WINDOW_NORMAL)
             cv2.imshow("Full Frame", full_frame)
             cv2.namedWindow("ROI Motion Mask", cv2.WINDOW_NORMAL)
-            cv2.imshow("ROI Motion Mask", mask)
-            # cv2.imshow("Overlayed Frame", overlayed_frame)
-        
-        # if current_train_direction:
-        #     cv2.putText(frame, current_train_direction, (20,40),
-        #         cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)        
+            cv2.imshow("ROI Motion Mask", mask)   
         
         # this helps reduce CPU load by limiting live stream frame updates
-        if time.time() - last_stream_update_ts > 1:
+        if time.time() - last_stream_update_ts > 0.5:
             update_frame(full_frame)
             last_stream_update_ts = time.time()
 
