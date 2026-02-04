@@ -70,6 +70,14 @@ async function fetchRecentTrains() {
     });
 }
 
+async function fetchSystemStatus() {
+    const res = await fetch("/api/device/temp");
+    const info = await res.json();
+
+    const body = document.getElementById("systemStatus");
+    body.textContent = `Device Temperature: ${info.temperature} °C. Status: ${info.status}`;
+}
+
 // initial fetch + auto-refresh
 fetchActive();
 setInterval(fetchActive, 10000); // update status every 5s
@@ -77,5 +85,5 @@ setInterval(fetchActive, 10000); // update status every 5s
 fetchRecentTrains();
 setInterval(fetchRecentTrains, 10000);
 
-// let's hold off on doing this
-// renderDowChart();
+fetchSystemStatus();
+setInterval(fetchSystemStatus, 15000);
