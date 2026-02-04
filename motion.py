@@ -14,8 +14,8 @@ class MotionDetector:
         self.avg_history = deque(maxlen=moving_avg_frames)
 
         self.bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-            history=800,
-            varThreshold=20,
+            history=250,
+            varThreshold=15,
             detectShadows=False
         )
 
@@ -34,7 +34,7 @@ class MotionDetector:
 
     def detect(self, roi_frame, freeze_bg=False):
         # background subtraction
-        learning_rate = 0 if freeze_bg else 0.01
+        learning_rate = 0 if freeze_bg else 0.001
         mask = self.bg_subtractor.apply(roi_frame, learningRate=learning_rate)
 
         _, mask = cv2.threshold(mask, 120, 255, cv2.THRESH_BINARY)
