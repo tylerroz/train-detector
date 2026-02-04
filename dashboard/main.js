@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Fetch Recent Trains ---
     async function fetchRecentTrains() {
         try {
-            const res = await fetch("/api/recent_trains");
+            const res = await fetch("/api/recent_trains?validStatus=true");
             if (!res.ok) throw new Error("Failed to fetch /api/recent_trains");
             const rows = await res.json();
 
@@ -110,9 +110,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const ctx = document.getElementById("dowChart").getContext("2d");
         const dowData = await fetchDowData();
         const labels = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]; // matches 0=Sunday
-
-        console.log("Chart labels:", labels);
-        console.log("Chart data:", dowData);
 
         if (dowChartInstance) {
             // update existing chart

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from database import get_conn
 
 api_bp = Blueprint("api", __name__)
@@ -18,14 +18,23 @@ def active():
 
 @api_bp.route("/api/recent_trains")
 def recent_trains():
+    validStatus = request.args.get("validStatus")
+
     conn = get_conn()
     cur = conn.cursor(dictionary=True)
-    cur.execute("""
+
+    query = """
         SELECT id, start_time, end_time, duration_seconds, status, direction
         FROM train_events
-        ORDER BY start_time DESC
-        LIMIT 10
-    """)
+    """
+    params = []
+
+    if validStatus:
+        query += " WHERE status != 'ABORTED'"
+
+    query += " ORDER BY start_time DESC LIMIT 10"
+
+    cur.execute(query, params)
     rows = cur.fetchall()
     conn.close()
 
