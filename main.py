@@ -120,10 +120,10 @@ def main():
         
         # if current_train_direction:
         #     cv2.putText(frame, current_train_direction, (20,40),
-        #         cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+        #         cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)        
         
         # this helps reduce CPU load by limiting live stream frame updates
-        if time.time() - last_stream_update_ts > 5:
+        if time.time() - last_stream_update_ts > 1:
             update_frame(full_frame)
             last_stream_update_ts = time.time()
             

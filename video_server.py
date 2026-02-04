@@ -7,32 +7,39 @@ from threading import Lock
 app = Flask(__name__)
 
 _latest_frame = None
+_latest_jpeg = None
 _lock = Lock()
 
 def update_frame(frame):
     global _latest_frame
+    global _latest_jpeg
     with _lock:
-        _latest_frame = frame.copy()
+        ok, jpg = cv2.imencode(
+            ".jpg",
+            frame,
+            [cv2.IMWRITE_JPEG_QUALITY, 80]
+        )
+        if ok:
+            _latest_jpeg = jpg.tobytes()
 
 def _mjpeg_generator():
     while True:
         with _lock:
-            frame = _latest_frame
+            jpg = _latest_jpeg
 
-        if frame is None:
-            time.sleep(0.05)
-            continue
-
-        ok, jpg = cv2.imencode(".jpg", frame)
-        if not ok:
+        if jpg is None:
+            time.sleep(0.1)
             continue
 
         yield (
             b"--frame\r\n"
             b"Content-Type: image/jpeg\r\n\r\n" +
-            jpg.tobytes() +
+            jpg +
             b"\r\n"
         )
+
+        # 1/ stream FPS (20)
+        time.sleep(.05)
 
 @app.route("/video")
 def video():
