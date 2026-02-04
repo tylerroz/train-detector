@@ -14,8 +14,8 @@ class MotionDetector:
         self.avg_history = deque(maxlen=moving_avg_frames)
 
         self.bg_subtractor = cv2.createBackgroundSubtractorMOG2(
-            history=500,
-            varThreshold=23,
+            history=800,
+            varThreshold=20,
             detectShadows=False
         )
 
@@ -37,14 +37,14 @@ class MotionDetector:
         learning_rate = 0 if freeze_bg else 0.01
         mask = self.bg_subtractor.apply(roi_frame, learningRate=learning_rate)
 
-        _, mask = cv2.threshold(mask, 180, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(mask, 120, 255, cv2.THRESH_BINARY)
 
         # morph cleanup
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel, iterations=1)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel, iterations=2)
         mask = cv2.dilate(
             mask,
-            cv2.getStructuringElement(cv2.MORPH_RECT, (9, 3)),
+            cv2.getStructuringElement(cv2.MORPH_RECT, (20, 3)),
             iterations=1
         )
 
