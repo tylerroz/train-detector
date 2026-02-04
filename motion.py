@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 from collections import deque
 from constants import TrainDirection
 
@@ -25,20 +26,42 @@ class MotionDetector:
         self.locked_direction = None
 
         self.min_coverage = min_coverage
+        
+        self.motion_energy = None
+        self.energy_decay = 0.9      # ~1–1.5s decay at ~20fps
+        self.energy_threshold = 1.5  # how persistent motion must be
 
     def reset(self):
         """Call this when a train fully clears."""
         self.avg_history.clear()
         self.centroid_history.clear()
         self.locked_direction = None
+        self.motion_energy = None
 
     def detect(self, roi_frame, freeze_bg=False):
         # background subtraction
         learning_rate = 0 if freeze_bg else 0.001
-        mask = self.bg_subtractor.apply(roi_frame, learningRate=learning_rate)
+        gray = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2GRAY)
+        mask = self.bg_subtractor.apply(gray, learningRate=learning_rate)
 
         _, mask = cv2.threshold(mask, 120, 255, cv2.THRESH_BINARY)
+        
+        # initialize motion energy lazily
+        if self.motion_energy is None:
+            self.motion_energy = np.zeros(mask.shape, dtype=np.float32)
 
+        # decay existing motion
+        self.motion_energy *= self.energy_decay
+
+        # reinforce where new motion appears
+        self.motion_energy[mask > 0] += 1.0
+
+        # clamp to prevent runaway growth
+        np.clip(self.motion_energy, 0, 5.0, out=self.motion_energy)
+
+        # rebuild mask from energy
+        mask = (self.motion_energy > self.energy_threshold).astype(np.uint8) * 255
+        
         # morph cleanup
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel, iterations=1)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel, iterations=2)
