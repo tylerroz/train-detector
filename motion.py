@@ -37,10 +37,10 @@ class MotionDetector:
         learning_rate = 0 if freeze_bg else 0.01
         mask = self.bg_subtractor.apply(roi_frame, learningRate=learning_rate)
 
-        _, mask = cv2.threshold(mask, 200, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(mask, 180, 255, cv2.THRESH_BINARY)
 
         # morph cleanup
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, self.kernel, iterations=1)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, self.kernel, iterations=2)
         mask = cv2.dilate(
             mask,
