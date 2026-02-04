@@ -118,6 +118,20 @@ def main():
         x1, y1, x2, y2 = ROI
         cv2.rectangle(full_frame, (x1,y1), (x2,y2), (0,255,0), 2)
         
+        # Convert ROI mask to color
+        colored_roi_mask = cv2.applyColorMap(mask, cv2.COLORMAP_JET)
+
+        # Blend only the ROI part
+        alpha = 0.4
+        full_frame[y1:y2, x1:x2] = cv2.addWeighted(
+            full_frame[y1:y2, x1:x2], 1.0, colored_roi_mask, alpha, 0
+        )
+            
+        if debug:
+            cv2.imshow("Full Frame", full_frame)
+            cv2.imshow("Motion Mask", mask)
+            # cv2.imshow("Overlayed Frame", overlayed_frame)
+        
         # if current_train_direction:
         #     cv2.putText(frame, current_train_direction, (20,40),
         #         cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)        
@@ -126,10 +140,6 @@ def main():
         if time.time() - last_stream_update_ts > 1:
             update_frame(full_frame)
             last_stream_update_ts = time.time()
-            
-        if debug:
-            cv2.imshow("Full Frame", full_frame)
-            cv2.imshow("Motion Mask", mask)
 
         # Exit on ESC
         if cv2.waitKey(1) == 27:
