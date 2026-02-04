@@ -21,7 +21,7 @@ def recent_trains():
     conn = get_conn()
     cur = conn.cursor(dictionary=True)
     cur.execute("""
-        SELECT id, start_time, end_time, duration_seconds, status
+        SELECT id, start_time, end_time, duration_seconds, status, direction
         FROM train_events
         ORDER BY start_time DESC
         LIMIT 10

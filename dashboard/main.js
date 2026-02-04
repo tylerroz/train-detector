@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${row.status || "-"}</td>
                     <td>${formatLocalTime(row.start_time)}</td>
                     <td>${formatLocalTime(row.end_time)}</td>
+                    <td>${row.direction || "-"}</td>
                     <td>${formatDuration(row.duration_seconds)}</td>
                 `;
                 tbody.appendChild(tr);

@@ -63,6 +63,7 @@ async function fetchRecentTrains() {
             <td>${row.status || "-"}</td>
             <td>${row.start_time}</td>
             <td>${row.end_time || "-"}</td>
+            <td>${row.direction || "-"}</td>
             <td>${row.duration_seconds || "-"}</td>
         `;
         tbody.appendChild(tr);
