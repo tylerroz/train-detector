@@ -1,6 +1,5 @@
 import cv2
 import json
-import os
 
 CONFIG_FILE = "cam_config.json"
 
