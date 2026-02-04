@@ -65,7 +65,7 @@ def end_train_event(direction=None):
             status = 'CLOSED',
             direction = %s
         WHERE id = %s
-    """, (end, duration, direction, row["id"]))
+    """, (end, duration, direction.name, row["id"]))
 
     conn.commit()
     conn.close()
