@@ -37,7 +37,7 @@ def start_train_event():
     conn.commit()
     conn.close()
 
-def end_train_event():
+def end_train_event(direction=None):
     conn = get_conn()
     cur = conn.cursor(dictionary=True)
 
@@ -62,9 +62,10 @@ def end_train_event():
         UPDATE train_events
         SET end_time = %s,
             duration_seconds = %s,
-            status = 'CLOSED'
+            status = 'CLOSED',
+            direction = %s
         WHERE id = %s
-    """, (end, duration, row["id"]))
+    """, (end, duration, direction, row["id"]))
 
     conn.commit()
     conn.close()

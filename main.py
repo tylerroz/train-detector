@@ -73,33 +73,54 @@ def main():
         if result is None:
             time.sleep(0.05)
             continue
+
         roi_frame, full_frame = result
 
-        # Freeze learning if train is present
+        prev_train_present = train_gate.train_present
         freeze_bg = train_gate.train_present
-        mask, avg_area = motion_detector.detect(roi_frame, freeze_bg=freeze_bg)   
-                
+
+        mask, avg_area, direction = motion_detector.detect(
+            roi_frame,
+            freeze_bg=freeze_bg
+        )
+
         train_present, state = train_gate.update(mask)
-        
+
+        if train_present and current_train_direction is None and direction is not None:
+            current_train_direction = direction
+
+        # train start
         if not prev_train_present and train_present:
             log("Train START detected!")
             train_timer = time.time()
-            if should_notify: notify_train_arrived()
             database.start_train_event()
+            if should_notify:
+                notify_train_arrived()
 
+        # train end
         elif prev_train_present and not train_present:
             log("Train is GONE!")
             train_duration = time.time() - train_timer if train_timer else 0
             log(f"Train duration: {train_duration:.1f} seconds")
-            train_timer = None
-            if should_notify: notify_train_gone()
-            database.end_train_event()
+            database.end_train_event(
+                direction=current_train_direction,
+            )
+            if should_notify:
+                notify_train_gone()
 
-        prev_train_present = train_present
+            # Reset per-train state
+            current_train_direction = None
+            train_timer = None
+            motion_detector.reset()
+
 
         # Visualization
         x1, y1, x2, y2 = ROI
         cv2.rectangle(full_frame, (x1,y1), (x2,y2), (0,255,0), 2)
+        
+        # if current_train_direction:
+        #     cv2.putText(frame, current_train_direction, (20,40),
+        #         cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
         
         # this helps reduce CPU load by limiting live stream frame updates
         if time.time() - last_stream_update_ts > 5:
