@@ -102,7 +102,7 @@ class MotionDetector:
         # direction inference and locking
         direction, slope = self._infer_horizontal_direction(roi_width)
 
-        if direction and self.locked_direction is None:
+        if direction is not None and self.locked_direction is None:
             self.locked_direction = direction
             print(f"Locked direction: {direction}, slope: {slope:.2f}")
 
@@ -114,7 +114,7 @@ class MotionDetector:
 
     def _infer_horizontal_direction(self, roi_width):
         if len(self.centroid_history) < 8:
-            return None
+            return None, None
 
         # fit linear trend to centroid history
         indices = np.arange(len(self.centroid_history))
