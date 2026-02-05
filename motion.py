@@ -9,7 +9,7 @@ class MotionDetector:
         motion_threshold=200,
         moving_avg_frames=5,
         centroid_history_frames=12,
-        min_coverage=0.35
+        min_coverage=0.4
     ):
         self.motion_threshold = motion_threshold
         self.avg_history = deque(maxlen=moving_avg_frames)
@@ -112,14 +112,18 @@ class MotionDetector:
         return mask, avg_area, self.locked_direction
 
     def _infer_horizontal_direction(self, roi_width):
-        if len(self.centroid_history) < 6:
+        if len(self.centroid_history) < 8:
             return None
 
-        dx = self.centroid_history[-1] - self.centroid_history[0]
-        min_dx = int(roi_width * 0.1)  # proportional threshold
+        # fit linear trend to centroid history
+        indices = np.arange(len(self.centroid_history))
+        slope = np.polyfit(indices, list(self.centroid_history), 1)[0]
 
-        if abs(dx) < min_dx:
+        # minimum slope threshold (pixels per frame)
+        min_slope = 0.5
+
+        if abs(slope) < min_slope:
             return None
 
-        # southbound is left-to-right
-        return TrainDirection.SOUTHBOUND if dx > 0 else TrainDirection.NORTHBOUND
+        # southbound is left-to-right (positive slope)
+        return TrainDirection.SOUTHBOUND if slope > 0 else TrainDirection.NORTHBOUND
