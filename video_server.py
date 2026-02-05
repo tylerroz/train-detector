@@ -43,10 +43,14 @@ def _mjpeg_generator():
 
 @app.route("/video")
 def video():
-    return Response(
+    response = Response(
         _mjpeg_generator(),
         mimetype="multipart/x-mixed-replace; boundary=frame"
     )
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 def start_video_server():
     log = logging.getLogger('werkzeug')
