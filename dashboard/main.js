@@ -69,11 +69,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const tr = document.createElement("tr");
                 if (row.status === "active" || row.active) tr.classList.add("active");
                 tr.innerHTML = `
-                    <td>${row.status || "-"}</td>
                     <td>${formatLocalTime(row.start_time)}</td>
                     <td>${formatLocalTime(row.end_time)}</td>
-                    <td>${row.direction || "-"}</td>
                     <td>${formatDuration(row.duration_seconds)}</td>
+                    <td>${row.direction || "-"}</td>
                 `;
                 tbody.appendChild(tr);
             });
