@@ -154,6 +154,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById('videoCanvas');
     const ctx = canvas.getContext('2d');
     const hiddenImg = document.getElementById('hiddenImg');
+    // Set src with timestamp to prevent caching
+    hiddenImg.src = "/video?" + Date.now();
     let drawInterval;
     // Initial loading text
     ctx.fillStyle = 'white';
