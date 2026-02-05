@@ -122,12 +122,14 @@ body.train-present {
   color: #f1f5f9;
   font-weight: bold;
   text-align: left;
+  white-space: nowrap;
 }
 
 #recentTrains td {
   padding: 8px;
   border-top: 1px solid #111827;
   color: #e5e7eb;
+  white-space: nowrap;
 }
 
 #recentTrains tbody tr:nth-child(even) {
@@ -165,4 +167,17 @@ body.train-present {
 
 .dashboard-footer a:hover {
   text-decoration: underline;
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+  .recent-trains-card {
+    overflow-x: auto;
+  }
+
+  #recentTrains th,
+  #recentTrains td {
+    padding: 4px;
+    font-size: 0.9rem;
+  }
 }
