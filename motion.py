@@ -100,10 +100,11 @@ class MotionDetector:
         avg_area = sum(self.avg_history) / len(self.avg_history)
 
         # direction inference and locking
-        direction = self._infer_horizontal_direction(roi_width)
+        direction, slope = self._infer_horizontal_direction(roi_width)
 
         if direction and self.locked_direction is None:
             self.locked_direction = direction
+            print(f"Locked direction: {direction}, slope: {slope:.2f}")
 
         # need locked direction (unsure about this)
         if self.locked_direction is None:
@@ -120,10 +121,11 @@ class MotionDetector:
         slope = np.polyfit(indices, list(self.centroid_history), 1)[0]
 
         # minimum slope threshold (pixels per frame)
-        min_slope = 0.5
+        min_slope = 1.0
 
         if abs(slope) < min_slope:
-            return None
+            return None, None
 
         # southbound is left-to-right (positive slope)
-        return TrainDirection.SOUTHBOUND if slope > 0 else TrainDirection.NORTHBOUND
+        direction = TrainDirection.SOUTHBOUND if slope > 0 else TrainDirection.NORTHBOUND
+        return direction, slope
