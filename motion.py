@@ -23,7 +23,7 @@ class MotionDetector:
         self.kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
 
         self.centroid_history = deque(maxlen=centroid_history_frames)
-        self.locked_direction = None
+        self.current_direction = None
 
         self.min_coverage = min_coverage
         
@@ -35,7 +35,7 @@ class MotionDetector:
         """Call this when a train fully clears."""
         self.avg_history.clear()
         self.centroid_history.clear()
-        self.locked_direction = None
+        self.current_direction = None
         self.motion_energy = None
 
     def detect(self, roi_frame, freeze_bg=False):
@@ -76,7 +76,7 @@ class MotionDetector:
         if coords is None:
             self.centroid_history.clear()
             self.avg_history.append(0)
-            return mask, 0, self.locked_direction
+            return mask, 0, self.current_direction
 
         xs = coords[:, 0, 0]
         ys = coords[:, 0, 1]
@@ -88,7 +88,7 @@ class MotionDetector:
         if coverage < self.min_coverage:
             self.centroid_history.clear()
             self.avg_history.append(0)
-            return mask, 0, self.locked_direction
+            return mask, 0, self.current_direction
 
         # help with direction tracking
         cx = int(xs.mean())
@@ -99,33 +99,28 @@ class MotionDetector:
         self.avg_history.append(motion_area)
         avg_area = sum(self.avg_history) / len(self.avg_history)
 
-        # direction inference and locking
-        direction, slope = self._infer_horizontal_direction(roi_width)
+        # direction inference
+        direction, _ = self._infer_horizontal_direction(roi_width)
 
-        if direction is not None and self.locked_direction is None:
-            self.locked_direction = direction
-            print(f"Locked direction: {direction}, slope: {slope:.2f}")
+        if direction is not None:
+            self.current_direction = direction
 
-        # need locked direction (unsure about this)
-        if self.locked_direction is None:
+        # need current direction
+        if self.current_direction is None:
             avg_area = 0
 
-        return mask, avg_area, self.locked_direction
+        return mask, avg_area, self.current_direction
 
     def _infer_horizontal_direction(self, roi_width):
         if len(self.centroid_history) < 8:
             return None, None
 
-        # fit linear trend to centroid history
-        indices = np.arange(len(self.centroid_history))
-        slope = np.polyfit(indices, list(self.centroid_history), 1)[0]
+        dx = self.centroid_history[-1] - self.centroid_history[0]
+        min_dx = 10  # minimum displacement in pixels
 
-        # minimum slope threshold (pixels per frame)
-        min_slope = 1.0
-
-        if abs(slope) < min_slope:
+        if abs(dx) < min_dx:
             return None, None
 
-        # southbound is left-to-right (positive slope)
-        direction = TrainDirection.SOUTHBOUND if slope > 0 else TrainDirection.NORTHBOUND
-        return direction, slope
+        # southbound is left-to-right (positive dx)
+        direction = TrainDirection.SOUTHBOUND if dx > 0 else TrainDirection.NORTHBOUND
+        return direction, dx
