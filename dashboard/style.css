@@ -89,7 +89,7 @@ body.train-present {
 }
 
 .video-container canvas {
-  width: 90%;           /* scale to container width */
+  width: 100%;          /* scale to container width */
   height: auto;         /* maintain aspect ratio */
   display: block;        /* remove inline spacing */
 }
