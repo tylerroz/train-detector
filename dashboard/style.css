@@ -88,10 +88,9 @@ body.train-present {
   justify-content: center;   /* horizontal centering */
 }
 
-.video-container img {
+.video-container canvas {
   width: 90%;           /* scale to container width */
-  height: 90%;          /* fill container height */
-  object-fit: contain;   /* preserve aspect ratio */
+  height: auto;         /* maintain aspect ratio */
   display: block;        /* remove inline spacing */
 }
 

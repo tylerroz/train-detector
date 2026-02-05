@@ -149,4 +149,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderDowChart();
     setInterval(renderDowChart, 10000);
+
+    // MJPEG Video Player using hidden img
+    const canvas = document.getElementById('videoCanvas');
+    const ctx = canvas.getContext('2d');
+    const hiddenImg = document.getElementById('hiddenImg');
+    let drawInterval;
+    // Initial loading text
+    ctx.fillStyle = 'white';
+    ctx.font = '20px Arial';
+    ctx.fillText('Loading video...', 10, 50);
+    hiddenImg.onload = () => {
+        if (hiddenImg.naturalWidth > 0) {
+            canvas.width = hiddenImg.naturalWidth;
+            canvas.height = hiddenImg.naturalHeight;
+            // Start drawing once the image has loaded
+            drawInterval = setInterval(() => {
+                ctx.drawImage(hiddenImg, 0, 0, canvas.width, canvas.height);
+            }, 50); // Update at ~20fps
+        }
+    };
+    hiddenImg.onerror = () => {
+        ctx.fillText('Video load error, retrying...', 10, 50);
+        // Reload on error to handle connection issues
+        setTimeout(() => {
+            hiddenImg.src = "/video?" + Date.now();
+        }, 1000);
+    };
 });
