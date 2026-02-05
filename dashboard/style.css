@@ -172,11 +172,12 @@ body.train-present {
 /* --- Mobile Responsiveness --- */
 @media (max-width: 768px) {
   .recent-trains-card {
-    overflow-x: auto;
+    /* overflow-x: auto; */ /* Removed to allow text to shrink instead */
   }
 
   #recentTrains th,
   #recentTrains td {
     padding: 4px;
+    font-size: 0.8rem;
   }
 }
