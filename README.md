@@ -14,8 +14,6 @@ This project is deployed on a Raspberry Pi 4 and operates as a self-contained sy
 - Persisting train events to a database
 - Serving a REST API and web dashboard over the public internet
 
-The system is designed to run continuously in a real-world environment with no reliance on cloud services.
-
 ## Key Features
 
 - Real-time train detection using Python and OpenCV
@@ -33,6 +31,23 @@ The system is designed to run continuously in a real-world environment with no r
 - MySQL
 - HTML, CSS, JavaScript
 - Raspberry Pi 4 running Debian-ish
+
+## Networking and Deployment
+
+The Raspberry Pi runs the full application stack locally and serves HTTP traffic directly to external clients. This project required sharpening my networking skills, doing the following:
+
+- Setting up Dynamic DNS (DDNS) to handle a non-static ISP-assigned public IP
+- Router port forwarding for configuration
+- Static local IP assignment for the Raspberry Pi + netcam
+
+## Motivation
+
+I built this project for a couple reasons, namely:
+
+- To enjoy coding again! After only doing corporate work for a few years, I had lost the joy of building something for fun
+- Build a computer vision product for the first time
+- I've been wanting to do a "Pi Project" for a while now, this was a great opportunity
+- The train comes by every day, and it felt like wasted potential not doing something nerdy with that.
 
 ## (Ideal) Process Diagram
 ```mermaid
