@@ -51,7 +51,9 @@ class MotionDetector:
             self.motion_energy = np.zeros(mask.shape, dtype=np.float32)
 
         # decay existing motion
-        self.motion_energy *= self.energy_decay
+        self.motion_energy *= self.energy_decay # percentage decay
+        self.motion_energy -= 0.05 # constant decay to ensure eventual fadeout
+        np.maximum(self.motion_energy, 0, out=self.motion_energy)
 
         # reinforce where new motion appears
         self.motion_energy[mask > 0] += 1.0
