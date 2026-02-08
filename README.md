@@ -1,12 +1,38 @@
-# Tyler's Train Detector
-Components for a system used to identify and detect trains on the Union Pacific Austin Subdivision line.
+# TrainVision ATX
 
-This is my first attempt at a CV project... so don't judge :)
+TrainVision ATX is a computer vision system for detecting and tracking trains along the Union Pacific Austin Subdivision line in Downtown Austin, Texas.
+The project is entirely self-hosted on a Rasperry Pi in my apartment, giving insight on live and historical train activity data.
 
-Included in this repo:
-- All train detection logic
-- API to expose train data stored in SQL
-- Simple HTML dashboard for viewing train stats
+Live demo: http://trains.tylerroz.com
+
+## Overview
+
+This project is deployed on a Raspberry Pi 4 and operates as a self-contained system responsible for:
+
+- Capturing a live camera feed (netcam pointed at the tracks)
+- Detecting train motion using computer vision
+- Persisting train events to a database
+- Serving a REST API and web dashboard over the public internet
+
+The system is designed to run continuously in a real-world environment with no reliance on cloud services.
+
+## Key Features
+
+- Real-time train detection using Python and OpenCV
+- REST API for querying recent and historical train activity
+- MySQL-backed storage layer
+- HTML+JS dashboard for monitoring train events and system status
+- Edge deployment on Raspberry Pi hardware
+
+## Tech Stack
+
+- Python
+- OpenCV (CV2)
+- Apache (host the dashboard)
+- Flask (API endpoints)
+- MySQL
+- HTML, CSS, JavaScript
+- Raspberry Pi 4 running Debian-ish
 
 ## (Ideal) Process Diagram
 ```mermaid
