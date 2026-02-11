@@ -55,8 +55,15 @@ class MotionDetector:
         self.motion_energy -= 0.05 # constant decay to ensure eventual fadeout
         np.maximum(self.motion_energy, 0, out=self.motion_energy)
 
-        # reinforce where new motion appears
-        self.motion_energy[mask > 0] += 1.0
+        # reinforce when there is directional movement
+        reinforce = False
+        if len(self.centroid_history) >= 2:
+            dx = self.centroid_history[-1] - self.centroid_history[-2]
+            if abs(dx) > 2:
+                reinforce = True
+
+        if reinforce:
+            self.motion_energy[mask > 0] += 1.0
 
         # clamp to prevent runaway growth
         np.clip(self.motion_energy, 0, 5.0, out=self.motion_energy)
