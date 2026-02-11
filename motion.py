@@ -16,7 +16,7 @@ class MotionDetector:
 
         self.bg_subtractor = cv2.createBackgroundSubtractorMOG2(
             history=250,
-            varThreshold=15,
+            varThreshold=23,
             detectShadows=False
         )
 
