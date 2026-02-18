@@ -58,6 +58,7 @@ def trains_per_dow():
             (DAYOFWEEK(CONVERT_TZ(start_time, 'UTC', 'America/Chicago')) + 6) % 7 AS day_of_week,
             COUNT(*) AS train_count
         FROM train_events
+        WHERE status != 'ABORTED'
         GROUP BY day_of_week
         ORDER BY day_of_week
     """)
