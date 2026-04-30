@@ -6,15 +6,22 @@ api_bp = Blueprint("api", __name__)
 @api_bp.route("/api/active")
 def active():
     conn = get_conn()
-    cur = conn.cursor()
+    cur = conn.cursor(dictionary=True)
     cur.execute("""
-        SELECT EXISTS (
-            SELECT 1 FROM train_events WHERE status = 'OPEN'
-        )
+        SELECT start_time FROM train_events
+        WHERE status = 'OPEN'
+        ORDER BY start_time DESC
+        LIMIT 1
     """)
-    active = bool(cur.fetchone()[0])
+    row = cur.fetchone()
     conn.close()
-    return jsonify(active=active)
+
+    if row:
+        return jsonify(
+            active=True,
+            start_time=row["start_time"].strftime("%Y-%m-%d %H:%M:%S")
+        )
+    return jsonify(active=False, start_time=None)
 
 @api_bp.route("/api/recent_trains")
 def recent_trains():

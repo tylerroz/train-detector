@@ -30,6 +30,45 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${mins}m ${secs}s`;
     }
 
+    // --- Live train timer ---
+    let timerInterval = null;
+    let timerStartMs = null;
+
+    function startTimer(startTimeStr) {
+        // Server sends UTC like "2026-04-29 23:45:12" — convert to ms epoch.
+        const isoStart = startTimeStr.replace(' ', 'T') + 'Z';
+        const newStartMs = new Date(isoStart).getTime();
+
+        // If the timer is already running for this same train, leave it.
+        if (timerInterval && timerStartMs === newStartMs) return;
+
+        timerStartMs = newStartMs;
+        const timerEl = document.getElementById('train-timer');
+        timerEl.hidden = false;
+
+        function tick() {
+            const elapsed = Math.max(0, Math.floor((Date.now() - timerStartMs) / 1000));
+            const mins = Math.floor(elapsed / 60);
+            const secs = elapsed % 60;
+            timerEl.textContent =
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        tick();
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(tick, 1000);
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        timerStartMs = null;
+        const timerEl = document.getElementById('train-timer');
+        timerEl.hidden = true;
+        timerEl.textContent = '';
+    }
+
     // --- Fetch Train Status ---
     async function fetchActive() {
         try {
@@ -45,10 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 statusDiv.textContent = "🚂 Train Present!";
                 body.classList.add("train-present");
                 statusCard.classList.add("train-present");
+                if (data.start_time) startTimer(data.start_time);
             } else {
                 statusDiv.textContent = "☹️ No current train detected...";
                 body.classList.remove("train-present");
                 statusCard.classList.remove("train-present");
+                stopTimer();
             }
         } catch (err) {
             console.error(err);

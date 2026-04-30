@@ -82,6 +82,16 @@ body.train-present {
   margin-bottom: 8px;
 }
 
+.train-timer {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #facc15;
+  text-shadow: 0 0 12px rgba(250, 204, 21, 0.5);
+  margin: 4px 0 12px 0;
+  letter-spacing: 0.05em;
+}
+
 .video-container {
   width: 100%;           /* container width can change */
   overflow: hidden;      /* clip overflow */
