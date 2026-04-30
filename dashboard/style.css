@@ -59,6 +59,7 @@ body.train-present {
   margin-top: 10px;
   width: 90%;
   max-width: 800px;
+  box-sizing: border-box;
   box-shadow: 0 0 20px rgba(0,0,0,0.4);
 }
 
@@ -177,14 +178,18 @@ body.train-present {
 .live-card {
   position: relative;
   padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .live-card video {
   width: 100%;
+  max-width: 100%;
   height: auto;
   display: block;
   background: #000;
   border-radius: 8px;
+  object-fit: contain;
 }
 
 .live-start {
