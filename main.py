@@ -4,7 +4,7 @@ import database
 import json
 import sys
 
-from camera import open_camera, read_frame
+from camera import ResilientCamera
 from helper import log
 from motion import MotionDetector
 from notifications import notify_train_arrived, notify_train_gone
@@ -36,7 +36,7 @@ def main():
     print("  debug (enables verbose output and visualization):", debug)
     print("  notify (enables push notifications):", should_notify)
 
-    cap = open_camera(RTSP_URL)
+    cam = ResilientCamera(RTSP_URL, ROI)
     print("Camera stream initialized.")
     motion_detector = MotionDetector(motion_threshold=MOTION_AREA_THRESHOLD)
     print("Motion detector initialized.")
@@ -70,7 +70,7 @@ def main():
     current_train_direction = None
 
     while True:
-        result = read_frame(cap, ROI)
+        result = cam.read()
         if result is None:
             time.sleep(0.05)
             continue
@@ -143,7 +143,7 @@ def main():
         if cv2.waitKey(1) == 27:
             break
 
-    cap.release()
+    cam._cap.release()
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
