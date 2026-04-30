@@ -22,9 +22,9 @@ should_notify = 'notify' in sys.argv
 with open("cam_config.json", "r") as f:
     config = json.load(f)
 
-RTSP_URL = config["rtsp_url"]
+RTSP_URL = config["rtsp_urls"][config["quality"]]
 roi_cfg = config["roi"]
-ROI = (roi_cfg["x1"], roi_cfg["y1"], roi_cfg["x2"], roi_cfg["y2"])
+ROI = (roi_cfg["x1"], roi_cfg["y1"], roi_cfg["x2"], roi_cfg["y2"])  # normalized 0-1 fracs
 
 # Motion & train settings
 START_FRAMES = 10
@@ -141,8 +141,11 @@ def main():
             motion_detector.reset()
 
 
-        # Visualization
-        x1, y1, x2, y2 = ROI
+        # Visualization — derive pixel coords from normalized ROI + this frame's dims
+        fh, fw = full_frame.shape[:2]
+        nx1, ny1, nx2, ny2 = ROI
+        x1, y1 = int(nx1 * fw), int(ny1 * fh)
+        x2, y2 = int(nx2 * fw), int(ny2 * fh)
         cv2.rectangle(full_frame, (x1,y1), (x2,y2), (0,255,0), 2)
         
         # Convert ROI mask to color

@@ -1,9 +1,13 @@
 {
-  "rtsp_url": "rtsp://traincam:unionpacific111@192.168.1.233:554/stream2",
+  "rtsp_urls": {
+    "low":  "rtsp://traincam:unionpacific111@192.168.1.233:554/stream2",
+    "high": "rtsp://traincam:unionpacific111@192.168.1.233:554/stream1"
+  },
+  "quality": "low",
   "roi": {
-    "x1": 110,
-    "y1": 189,
-    "x2": 431,
-    "y2": 236
+    "x1": 0.1719,
+    "y1": 0.5250,
+    "x2": 0.6734,
+    "y2": 0.6556
   }
 }

@@ -33,7 +33,7 @@ webrtcAddress: 127.0.0.1:8889
 
 paths:
   cam:
-    source: rtsp://traincam:unionpacific111@192.168.1.233:554/stream2
+    source: rtsp://traincam:unionpacific111@192.168.1.233:554/stream1
     # only pull from camera when somebody is watching
     sourceOnDemand: yes
     sourceOnDemandStartTimeout: 10s

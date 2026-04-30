@@ -14,9 +14,9 @@ def open_camera(rtsp_url):
 
 
 class ResilientCamera:
-    def __init__(self, rtsp_url, roi):
+    def __init__(self, rtsp_url, roi_norm):
         self.rtsp_url = rtsp_url
-        self.roi = roi
+        self.roi_norm = roi_norm  # (x1, y1, x2, y2) as 0-1 fractions of frame dims
         self._cap = open_camera(rtsp_url)
         self._fail_streak = 0
 
@@ -43,10 +43,12 @@ class ResilientCamera:
             return None
 
         self._fail_streak = 0
-        x1, y1, x2, y2 = self.roi
         h, w = frame.shape[:2]
-        x1, x2 = max(0, min(x1, w - 1)), max(0, min(x2, w))
-        y1, y2 = max(0, min(y1, h - 1)), max(0, min(y2, h))
+        nx1, ny1, nx2, ny2 = self.roi_norm
+        x1 = max(0, min(int(nx1 * w), w - 1))
+        y1 = max(0, min(int(ny1 * h), h - 1))
+        x2 = max(0, min(int(nx2 * w), w))
+        y2 = max(0, min(int(ny2 * h), h))
         if x2 <= x1 or y2 <= y1:
             return None
         return frame[y1:y2, x1:x2], frame
