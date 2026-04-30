@@ -37,7 +37,7 @@ def start_train_event():
     conn.commit()
     conn.close()
 
-def end_train_event(direction=None):
+def end_train_event(direction=None, aborted=False):
     conn = get_conn()
     cur = conn.cursor(dictionary=True)
 
@@ -57,15 +57,17 @@ def end_train_event(direction=None):
     end = now_utc()
     start = row["start_time"].replace(tzinfo=timezone.utc)
     duration = int((end - start).total_seconds())
+    status = 'ABORTED' if aborted else 'CLOSED'
+    direction_name = direction.name if direction is not None else None
 
     cur.execute("""
         UPDATE train_events
         SET end_time = %s,
             duration_seconds = %s,
-            status = 'CLOSED',
+            status = %s,
             direction = %s
         WHERE id = %s
-    """, (end, duration, direction.name, row["id"]))
+    """, (end, duration, status, direction_name, row["id"]))
 
     conn.commit()
     conn.close()

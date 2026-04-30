@@ -40,7 +40,9 @@ class MotionDetector:
 
     def detect(self, roi_frame, freeze_bg=False):
         # background subtraction
-        learning_rate = 0 if freeze_bg else 0.001
+        # soft-freeze during trains: tiny non-zero rate so multi-minute
+        # ghosts get absorbed instead of locking the foreground in place
+        learning_rate = 0.00005 if freeze_bg else 0.001
         gray = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2GRAY)
         mask = self.bg_subtractor.apply(gray, learningRate=learning_rate)
 

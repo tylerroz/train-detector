@@ -29,6 +29,7 @@ ROI = (roi_cfg["x1"], roi_cfg["y1"], roi_cfg["x2"], roi_cfg["y2"])
 START_FRAMES = 10
 STOP_FRAMES = 20
 MOTION_AREA_THRESHOLD = 200
+MAX_TRAIN_DURATION_SECONDS = 15 * 60  # safety valve: longest plausible freight
 
 def main():
     print("Starting train detection...")
@@ -86,6 +87,23 @@ def main():
         )
 
         train_present, state = train_gate.update(mask)
+
+        # Safety valve: if a "train" has been present longer than any real
+        # train could last, the detector is almost certainly stuck on a ghost.
+        # Abort the event, hard-reset state, and continue.
+        if (
+            train_present
+            and train_timer is not None
+            and time.time() - train_timer > MAX_TRAIN_DURATION_SECONDS
+        ):
+            log(f"Train present > {MAX_TRAIN_DURATION_SECONDS}s — aborting as ghost.")
+            database.end_train_event(aborted=True)
+            train_gate = TrainGate(persistence_frames=45, grace_frames=400)
+            motion_detector.reset()
+            current_train_direction = None
+            train_timer = None
+            prev_train_present = False
+            continue
 
         if train_present and current_train_direction is None and direction is not None:
             current_train_direction = direction
