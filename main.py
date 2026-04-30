@@ -4,6 +4,7 @@ import database
 import json
 import sys
 
+from api.app import start_api_server
 from camera import ResilientCamera
 from helper import log
 from motion import MotionDetector
@@ -63,6 +64,13 @@ def main():
     video_thread.start()
     last_stream_update_ts = 0
     print("Video stream available on http://<host>:8080/video")
+
+    api_thread = Thread(
+        target=start_api_server,
+        daemon=True
+    )
+    api_thread.start()
+    print("API listening on 127.0.0.1:5000")
         
     print("Ready and looking for trains...")
 
