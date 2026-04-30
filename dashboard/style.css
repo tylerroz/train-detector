@@ -114,9 +114,10 @@ body.train-present {
   display: inline-block;
   padding: 10px 20px;
   background-color: #facc15;
-  color: #111827;
+  color: #f9fafb;
   font-weight: 600;
   text-decoration: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   border-radius: 999px;
   box-shadow: 0 0 12px rgba(250, 204, 21, 0.35);
   transition: box-shadow 0.25s ease, transform 0.15s ease;
