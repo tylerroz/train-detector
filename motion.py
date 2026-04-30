@@ -38,11 +38,25 @@ class MotionDetector:
         self.current_direction = None
         self.motion_energy = None
 
+    def hard_reset(self):
+        """Like reset(), but also rebuilds the MOG2 background model from
+        scratch. Used after the safety valve aborts a stuck ghost event so
+        whatever lighting drift caused the ghost gets baked into the new
+        background as the 'new normal'."""
+        self.reset()
+        self.bg_subtractor = cv2.createBackgroundSubtractorMOG2(
+            history=250,
+            varThreshold=23,
+            detectShadows=False
+        )
+
     def detect(self, roi_frame, freeze_bg=False):
         # background subtraction
-        # soft-freeze during trains: tiny non-zero rate so multi-minute
-        # ghosts get absorbed instead of locking the foreground in place
-        learning_rate = 0.00005 if freeze_bg else 0.001
+        # hard-freeze during trains so long, repetitive trains (e.g. night
+        # freight where many cars look the same) don't absorb into the
+        # background. Ghost events are bounded by the safety valve in main.py,
+        # which calls hard_reset() to rebuild the bg model on abort.
+        learning_rate = 0 if freeze_bg else 0.001
         gray = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2GRAY)
         mask = self.bg_subtractor.apply(gray, learningRate=learning_rate)
 

@@ -107,7 +107,7 @@ def main():
             log(f"Train present > {MAX_TRAIN_DURATION_SECONDS}s — aborting as ghost.")
             database.end_train_event(aborted=True)
             train_gate = TrainGate(persistence_frames=45, grace_frames=400)
-            motion_detector.reset()
+            motion_detector.hard_reset()
             current_train_direction = None
             train_timer = None
             prev_train_present = False
