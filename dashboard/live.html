@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Stream — Austin Train Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="dashboard-header">
+    <h1>Live Camera</h1>
+    <p class="dashboard-description">
+      Real-time view of the Union Pacific Austin Subdivision line.
+    </p>
+  </header>
+
+  <a class="back-link" href="/">← Back to dashboard</a>
+
+  <div class="card live-card">
+    <span class="live-badge">LIVE</span>
+    <video
+      id="liveVideo"
+      controls
+      muted
+      playsinline
+      preload="none">
+    </video>
+    <button id="liveStart" class="live-start" type="button" aria-label="Start live stream">
+      <span class="live-start-icon">▶</span>
+      <span class="live-start-label">Start stream</span>
+    </button>
+  </div>
+
+  <footer class="dashboard-footer">
+    <p>Hosted on <a href="https://github.com/tylerroz/train-detector" target="_blank">GitHub</a>. Made by
+    <a href="https://tylerroz.com" target="_blank">Tyler</a>.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
+  <script>
+    const video = document.getElementById('liveVideo');
+    const startBtn = document.getElementById('liveStart');
+    const src = '/hls/cam/index.m3u8';
+
+    function startStream() {
+      startBtn.remove();
+
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari (incl. iOS) plays HLS natively
+        video.src = src;
+      } else if (window.Hls && Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(src);
+        hls.attachMedia(video);
+      } else {
+        const msg = document.createElement('p');
+        msg.className = 'live-unsupported';
+        msg.textContent = 'Your browser does not support HLS playback.';
+        document.querySelector('.live-card').appendChild(msg);
+        return;
+      }
+
+      // The user click is the gesture browsers require for autoplay/audio.
+      video.play().catch(() => {
+        // Some browsers reject play() if the source is still loading;
+        // they'll start automatically once metadata is ready.
+      });
+    }
+
+    startBtn.addEventListener('click', startStream, { once: true });
+  </script>
+</body>
+</html>

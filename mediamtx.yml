@@ -1,0 +1,40 @@
+###############################################
+# MediaMTX config for TrainVision ATX
+# - pulls H.264 from the netcam over RTSP
+# - republishes as HLS (used by dashboard) and
+#   WebRTC (available if we want low-latency later)
+###############################################
+
+logLevel: info
+logDestinations: [stdout]
+
+# Disable protocols we don't use, keep ports tidy
+rtmp: no
+srt: no
+
+# RTSP server stays on (default :8554) — handy for re-pointing
+# the detector at MediaMTX later if camera connection limit becomes
+# an issue
+rtsp: yes
+rtspAddress: :8554
+
+# HLS — what the dashboard consumes
+hls: yes
+hlsAddress: 127.0.0.1:8888
+hlsAlwaysRemux: no
+hlsVariant: mpegts
+hlsSegmentCount: 5
+hlsSegmentDuration: 2s
+hlsAllowOrigins: ['*']
+
+# WebRTC — wired up but no dashboard link yet
+webrtc: yes
+webrtcAddress: 127.0.0.1:8889
+
+paths:
+  cam:
+    source: rtsp://traincam:unionpacific111@192.168.1.233:554/stream2
+    # only pull from camera when somebody is watching
+    sourceOnDemand: yes
+    sourceOnDemandStartTimeout: 10s
+    sourceOnDemandCloseAfter: 10s

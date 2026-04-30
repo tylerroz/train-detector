@@ -1,0 +1,14 @@
+[Unit]
+Description=MediaMTX (RTSP -> HLS bridge for TrainVision ATX)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/mediamtx /home/tylerroz/projects/train-detector/mediamtx.yml
+Restart=on-failure
+RestartSec=3
+User=tylerroz
+
+[Install]
+WantedBy=multi-user.target
